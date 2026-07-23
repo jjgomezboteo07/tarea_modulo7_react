@@ -1,32 +1,13 @@
 import { useState } from 'react';
-import { crearAlumno } from '../services/alumnosService';
-import { manejarError } from '../utils/manejarError';
+import { crearAlumno } from '../../services/alumnosService';
+import { manejarError } from '../../utils/manejarError';
+import { validarCampos } from '../../utils/validarCampos';
 
 const estadoInicial = {
   nombre: '',
   apellido: '',
   grado: '',
   seccion: '',
-};
-
-const validarCampos = (campos) => {
-  const errores = {};
-
-  if (campos.nombre.trim().length < 2) {
-    errores.nombre = 'El nombre debe tener al menos 2 caracteres';
-  }
-
-  if (campos.apellido.trim().length < 2) {
-    errores.apellido = 'El apellido debe tener al menos 2 caracteres';
-  }
-
-  if (campos.grado === '') {
-    errores.grado = 'Debes seleccionar un grado';
-  }
-
-  if (campos.seccion === '') {
-    errores.seccion = 'Debes seleccionar una seccion';
-  }
 };
 
 export const FormularioCrear = ({ onGuardado, onCancelar }) => {
@@ -46,11 +27,18 @@ export const FormularioCrear = ({ onGuardado, onCancelar }) => {
   const handleGuardar = async () => {
     const erroresEncontrado = validarCampos(campos);
 
+    if (Object.keys(erroresEncontrado).length > 0) {
+      setErrores(erroresEncontrado);
+
+      return;
+    }
+
     try {
       await crearAlumno(campos);
       onGuardado();
     } catch (error) {
       console.error('Error al momento de guardar un alumno');
+      manejarError(error);
     }
   };
 
@@ -68,7 +56,7 @@ export const FormularioCrear = ({ onGuardado, onCancelar }) => {
           placeholder='Ej: Vic'
         />
 
-        {errores.nombre && <p>{error.nombre}</p>}
+        {errores.nombre && <p>{errores.nombre}</p>}
       </div>
 
       <div>
@@ -81,7 +69,7 @@ export const FormularioCrear = ({ onGuardado, onCancelar }) => {
           placeholder='Ej: Flores'
         />
 
-        {errores.apellido && <p>{error.apellido}</p>}
+        {errores.apellido && <p>{errores.apellido}</p>}
       </div>
 
       <div>
@@ -93,7 +81,7 @@ export const FormularioCrear = ({ onGuardado, onCancelar }) => {
           <option value='9to'>9to</option>
         </select>
 
-        {errores.grado && <p>{error.grado}</p>}
+        {errores.grado && <p>{errores.grado}</p>}
       </div>
 
       <div>
@@ -104,7 +92,7 @@ export const FormularioCrear = ({ onGuardado, onCancelar }) => {
           <option value='B'>B</option>
         </select>
 
-        {errores.seccion && <p>{error.seccion}</p>}
+        {errores.seccion && <p>{errores.seccion}</p>}
       </div>
 
       <div>
